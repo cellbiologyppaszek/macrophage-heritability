@@ -1,0 +1,204 @@
+---
+title: "Rate Switching Analysis"
+author: "Apurv Srivastav"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: cosmopolite
+    toc: true
+    toc_float: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE, 
+  message = FALSE, 
+  warning = FALSE,
+  comment = NA
+)
+```
+
+
+### Environment Setup & Configuration
+```{r}
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(BB)
+
+# Global Configuration Parameters
+SET_SEED      <- 123
+BOOT_REPS     <- 1000
+LAMBDA_GROWTH <- log(2) / 14.4
+EPSILON       <- 1e-4
+
+# Global File Paths
+ODDS_RATIO_PATH <- "C:/Users/apurv/OneDrive/Desktop/Data Analysis/rate switch/Corrected_odds_ratio_CD36_tnfa_il1b.xlsx"
+FRACTIONS_PATH  <- "C:/Users/apurv/OneDrive/Desktop/Data Analysis/rate switch/IL! and CD36 fractions.xlsx"
+```
+
+### Data Ingestion & Parsing Workflow
+
+#### Importing Multi-Plate Datasets
+```{r}
+df_raw <- read_excel(ODDS_RATIO_PATH, sheet = "Sheet1", col_names = FALSE)
+
+# Detect structural boundaries based on the "Plate" header flag
+header_rows <- which(apply(df_raw, 1, function(x) any(x == "Plate", na.rm = TRUE)))
+datasets <- list()
+counter <- 1
+
+for (i in seq_along(header_rows)) {
+  start <- header_rows[i]
+  end   <- ifelse(i < length(header_rows), header_rows[i + 1] - 1, nrow(df_raw))
+  block <- df_raw[start:end, ]
+  mid   <- ncol(block) / 2
+  
+  # Parse left sub-plate matrix
+  left <- block[, 1:mid]
+  colnames(left) <- left[1, ]
+  datasets[[paste0("dataset", counter)]] <- left[-1, ]
+  counter <- counter + 1
+  
+  # Parse right sub-plate matrix
+  right <- block[, (mid + 1):ncol(block)]
+  colnames(right) <- right[1, ]
+  datasets[[paste0("dataset", counter)]] <- right[-1, ]
+  counter <- counter + 1
+}
+```
+
+#### Formatting Target Phenotype Populations
+```{r}
+clean_dataset <- function(data) {
+  data %>%
+    select_if(~ !all(is.na(.))) %>%
+    filter(!if_all(everything(), is.na))
+}
+
+# Isolate target baseline dataset and format numeric metrics securely
+CD36_Mock <- clean_dataset(datasets$dataset5) %>%
+  mutate(across(c(`on/on`, `off/off`, `on/off`), as.numeric))
+```
+
+#### Loading and Cleaning Fraction Benchmarks
+```{r}
+df_frac_raw <- read_excel(FRACTIONS_PATH, sheet = "Cd36 fractions", col_names = TRUE)
+df_frac_filtered <- df_frac_raw[, colSums(is.na(df_frac_raw)) != nrow(df_frac_raw)]
+
+# Define a functional parser for cleaner fraction sets
+parse_fraction_columns <- function(data, start_col, end_col) {
+  data[, start_col:end_col] %>%
+    setNames(c("log2Number", "FractionON")) %>%
+    mutate(across(everything(), as.numeric)) %>%
+    na.omit() %>%
+    mutate(FractionON = pmin(pmax(FractionON, EPSILON), 1 - EPSILON))
+}
+
+# Extract independent tracking profiles
+CD36_Mock_fraction <- parse_fraction_columns(df_frac_filtered, 1, 2)
+CD36_500_fraction  <- parse_fraction_columns(df_frac_filtered, 3, 4)
+```
+
+### Statistical Modeling & Bootstrapping
+#### Odds Ratio Core Estimation Logic
+```{r}
+compute_odds_ratio <- function(data, data_fraction) {
+  # Calculate Total Cell profiles
+  total_cells <- 2 * (data$`on/on` + data$`off/off` + data$`on/off`)
+  
+  p_onon   <- mean(data$`on/on`)   / mean(total_cells)
+  p_offoff <- mean(data$`off/off`) / mean(total_cells)
+  p_onoff  <- mean(data$`on/off`)  / mean(total_cells)
+  
+  or_value <- (4 * p_onon * p_offoff) / (p_onoff^2)
+  fon_mean <- mean(data_fraction$FractionON)
+  
+  c(OddsRatio = or_value, FractionON = fon_mean)
+}
+```
+
+#### Nonparametric Empirical Bootstrapping Loops
+```{r}
+set.seed(SET_SEED)
+
+boot_results <- replicate(BOOT_REPS, {
+  data_boot <- CD36_Mock[sample(nrow(CD36_Mock), replace = TRUE), ]
+  frac_boot <- CD36_Mock_fraction[sample(nrow(CD36_Mock_fraction), replace = TRUE), ]
+  compute_odds_ratio(data_boot, frac_boot)
+}) %>% 
+  t() %>% 
+  as.data.frame()
+```
+
+#### Target Population Summary Statistics Table
+```{r}
+calculate_ci_summary <- function(vector, digits = 5) {
+  stats <- c(
+    Mean  = mean(vector, na.rm = TRUE),
+    Lower = quantile(vector, 0.025, na.rm = TRUE),
+    Upper = quantile(vector, 0.975, na.rm = TRUE)
+  )
+  round(stats, digits)
+}
+
+summary_table <- rbind(
+  Odds_Ratio  = calculate_ci_summary(boot_results$OddsRatio),
+  Fraction_ON = calculate_ci_summary(boot_results$FractionON)
+)
+
+knitr::kable(summary_table, caption = "Empirical Summary Statistics with Bootstrapped 95% Confidence Bounds")
+```
+
+### Back-Calculating Phenotypic Transition Rates
+#### System of Equations Solver Engine
+
+```{r}
+solve_kon_koff <- function(odds_ratio, fraction_on, lambda = LAMBDA_GROWTH) {
+  equations <- function(vars) {
+    kon  <- vars[1]
+    koff <- vars[2]
+    
+    eq1 <- fraction_on - (kon / (kon + koff))
+    eq2 <- odds_ratio  - ((kon + lambda) * (koff + lambda)) / (kon * koff)
+    c(eq1, eq2)
+  }
+  
+  solution <- BBsolve(par = c(0.01, 0.01), fn = equations, quiet = TRUE)
+  return(solution$par)
+}
+```
+
+#### Bootstrapping Kinetic Rates
+```{r}
+set.seed(456)
+n_rate_boot <- 100 # Adjusted for efficient compilation matching initial configuration
+
+boot_k_params <- replicate(n_rate_boot, {
+  sample_rows <- sample(seq_len(nrow(boot_results)), replace = TRUE)
+  sample_data <- boot_results[sample_rows, ]
+  
+  mean_or <- mean(sample_data$OddsRatio)
+  mean_fr <- mean(sample_data$FractionON)
+  
+  tryCatch({
+    k_vals <- solve_kon_koff(mean_or, mean_fr)
+    c(kON = k_vals[1], kOFF = k_vals[2])
+  }, error = function(e) c(kON = NA, kOFF = NA))
+}) %>% 
+  t() %>% 
+  as.data.frame()
+```
+
+#### Final Estimated Biological Rates
+```{r}
+rates_table <- rbind(
+  kON  = calculate_ci_summary(boot_k_params$kON),
+  kOFF = calculate_ci_summary(boot_k_params$kOFF)
+)
+
+knitr::kable(rates_table, caption = "Estimated Steady-State Kinetic Switching Rates via Numerical Back-Calculation")
+```
+
