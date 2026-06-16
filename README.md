@@ -165,7 +165,7 @@ data/external/excel_inputs/
 | `IL1 and CD36 fractions.xlsx` | `R_scripts/Constant_Switching_Parameter_Simulation.R`, `R_scripts/Density_Dependent_Parameter_Simulation.R`, `R_scripts/Density_Dependent_Parameter_Simulation_kmax_beta.R`, `R_scripts/Optimized_Parameter_Estimation.R`, `R_scripts/Constant_Switching_Rates_Calculation.Rmd` |
 | `odds_ratio_CD36_tnfa_il1b.xlsx` | `R_scripts/Constant_Switching_Rates_Calculation.Rmd` |
 
-Note: Please check whether the filename `IL! and CD36 fractions.xlsx` is intentional. If the intended name is `IL1 and CD36 fractions.xlsx` or `IL-1 and CD36 fractions.xlsx`, update the filename and the scripts consistently.
+Note: Please check whether the filename `IL1 and CD36 fractions.xlsx` is intentional. If the intended name is `IL1 and CD36 fractions.xlsx` or `IL-1 and CD36 fractions.xlsx`, update the filename and the scripts consistently.
 
 ## Software requirements
 
@@ -233,8 +233,8 @@ install.packages(c("readxl", "dplyr", "ggplot2", "tidyr", "data.table"))
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/cellbiologyppaszek/Heritable-single-cell-gene-expression-ppaszek.git
-cd Heritable-single-cell-gene-expression-ppaszek
+git clone https://github.com/cellbiologyppaszek/macrophage-heritability.git
+cd macrophage-heritability
 ```
 
 ### 2. Download external files
@@ -322,7 +322,7 @@ Rscript -e "rmarkdown::render('R_scripts/Constant_Switching_Rates_Calculation.Rm
 Some R scripts may contain local absolute paths from the original analysis computer. Replace them with relative paths such as:
 
 ```r
-data_path <- "data/external/excel_inputs/IL! and CD36 fractions.xlsx"
+data_path <- "data/external/excel_inputs/IL1 and CD36 fractions.xlsx"
 ```
 
 or:
@@ -330,23 +330,6 @@ or:
 ```r
 data_path <- "data/processed/Cv_7_signals_FCV.csv"
 ```
-
-## Expected outputs
-
-Generated outputs should be written locally to:
-
-```text
-results/
-figures/
-```
-
-These folders are for local results only and should not be committed unless specific final figures or tables are intentionally included.
-
-| Folder | Content |
-|---|---|
-| `results/` | Generated tables, model outputs, intermediate processed files |
-| `figures/` | Generated plots in SVG, PNG, or PDF format |
-
 
 
 ## Reproducibility notes
