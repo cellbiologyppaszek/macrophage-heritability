@@ -42,23 +42,13 @@ official_code/
 |   |-- tnfr2_f480_costainning.ipynb
 |
 |-- R_scripts/
-|   |-- Constant_Switching_colony_tracking_Simulation_kmax_beta.R
 |   |-- Constant_Switching_Parameter_Simulation.R
 |   |-- Constant_Switching_Rates_Calculation.Rmd
-|   |-- Density_Dependent_colony_tracking_Simulation_kmax_beta.R
 |   |-- Density_Dependent_Parameter_Simulation.R
 |   |-- Density_Dependent_Parameter_Simulation_kmax_beta.R
 |   |-- Optimized_Parameter_Estimation.R
 |   |-- cv_fold_change_MemorySeq.R
 |   |-- cv_fold_change_scRNAseq.R
-|
-|-- results/
-|   | Generated tables and intermediate output files.
-|   | This folder is not committed to GitHub.
-|
-|-- figures/
-    | Generated SVG, PNG, or PDF figures.
-    | This folder is not committed to GitHub.
 ```
 
 ## What is included in GitHub
@@ -172,8 +162,8 @@ data/external/excel_inputs/
 
 | File | Used by |
 |---|---|
-| `IL! and CD36 fractions.xlsx` | `R_scripts/Constant_Switching_Parameter_Simulation.R`, `R_scripts/Density_Dependent_Parameter_Simulation.R`, `R_scripts/Density_Dependent_Parameter_Simulation_kmax_beta.R`, `R_scripts/Optimized_Parameter_Estimation.R`, `R_scripts/Constant_Switching_Rates_Calculation.Rmd` |
-| `Corrected_odds_ratio_CD36_tnfa_il1b.xlsx` | `R_scripts/Constant_Switching_Rates_Calculation.Rmd` |
+| `IL1 and CD36 fractions.xlsx` | `R_scripts/Constant_Switching_Parameter_Simulation.R`, `R_scripts/Density_Dependent_Parameter_Simulation.R`, `R_scripts/Density_Dependent_Parameter_Simulation_kmax_beta.R`, `R_scripts/Optimized_Parameter_Estimation.R`, `R_scripts/Constant_Switching_Rates_Calculation.Rmd` |
+| `odds_ratio_CD36_tnfa_il1b.xlsx` | `R_scripts/Constant_Switching_Rates_Calculation.Rmd` |
 
 Note: Please check whether the filename `IL! and CD36 fractions.xlsx` is intentional. If the intended name is `IL1 and CD36 fractions.xlsx` or `IL-1 and CD36 fractions.xlsx`, update the filename and the scripts consistently.
 
@@ -264,8 +254,6 @@ data/external/pkl_intermediate_files/
 data/external/sequencing_inputs/
 data/external/excel_inputs/
 ```
-
-Do not commit these external files to GitHub.
 
 ### 3. Run the Jupyter notebooks
 
@@ -359,58 +347,7 @@ These folders are for local results only and should not be committed unless spec
 | `results/` | Generated tables, model outputs, intermediate processed files |
 | `figures/` | Generated plots in SVG, PNG, or PDF format |
 
-## Recommended `.gitignore`
 
-The repository should include a `.gitignore` file to prevent external or large files from being committed.
-
-Recommended content:
-
-```text
-# External BioImage Archive data
-data/external/
-
-# Raw microscopy files
-*.tif
-*.tiff
-*.czi
-*.nd2
-*.lif
-
-# Large intermediate files
-*.pkl
-*.pkl.gz
-*.h5
-*.hdf5
-
-# Sequencing and compressed files
-*.zip
-*.tar.gz
-*.rar
-*.7z
-
-# Local results
-results/
-figures/
-
-# Jupyter temporary files
-.ipynb_checkpoints/
-
-# Python temporary files
-__pycache__/
-*.pyc
-
-# R temporary files
-.Rhistory
-.RData
-.Rproj.user/
-
-# System files
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
-```
 
 ## Reproducibility notes
 
