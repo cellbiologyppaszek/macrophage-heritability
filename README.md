@@ -60,10 +60,8 @@ official_code/
 |   |-- tnfr2_f480_costainning.ipynb
 |
 |-- R_scripts/
-|   |-- Constant_Switching_colony_tracking_Simulation_kmax_beta.R
 |   |-- Constant_Switching_Parameter_Simulation.R
 |   |-- Constant_Switching_Rates_Calculation.Rmd
-|   |-- Density_Dependent_colony_tracking_Simulation_kmax_beta.R
 |   |-- Density_Dependent_Parameter_Simulation.R
 |   |-- Density_Dependent_Parameter_Simulation_kmax_beta.R
 |   |-- Optimized_Parameter_Estimation.R
@@ -449,53 +447,6 @@ R_scripts/cv_fold_change_scRNAseq.R
 results/*.xlsx
 ```
 
-## Suggested `.gitignore`
-
-Use a `.gitignore` file to prevent raw or temporary files from being committed accidentally:
-
-```text
-# External large files downloaded from BioImage Archive
-data/external/
-
-# Generated outputs
-results/
-figures/
-
-# Jupyter temporary files
-.ipynb_checkpoints/
-
-# Python temporary files
-__pycache__/
-*.pyc
-
-# R temporary files
-.Rhistory
-.RData
-.Rproj.user/
-
-# System files
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
-
-# Large raw or intermediate data
-*.pkl
-*.pkl.gz
-*.h5
-*.hdf5
-*.tif
-*.tiff
-*.czi
-*.nd2
-*.lif
-*.zip
-*.tar.gz
-```
-
-The four processed CSV files in `data/processed/` should remain tracked by Git.
-
 ## Notes for users
 
 1. The processed CSV files in `data/processed/` are sufficient to reproduce the final CV comparison plot.
@@ -506,7 +457,7 @@ The four processed CSV files in `data/processed/` should remain tracked by Git.
 
 ## Citation
 
-If you use this code, processed data, or the associated external data, please cite the associated publication:
+If you use this code, processed data, or the associated external data, please cite the associated publication:
 
 ```text
 DOI: 10.64898/2026.06.17.732820
