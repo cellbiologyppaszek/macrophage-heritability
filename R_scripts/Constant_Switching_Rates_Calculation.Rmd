@@ -35,8 +35,8 @@ LAMBDA_GROWTH <- log(2) / 14.4
 EPSILON       <- 1e-4
 
 # Global File Paths
-ODDS_RATIO_PATH <- "C:/Users/apurv/OneDrive/Desktop/Data Analysis/rate switch/Corrected_odds_ratio_CD36_tnfa_il1b.xlsx"
-FRACTIONS_PATH  <- "C:/Users/apurv/OneDrive/Desktop/Data Analysis/rate switch/IL! and CD36 fractions.xlsx"
+ODDS_RATIO_PATH <- "..\data\external\excel_inputs\odds_ratio_CD36_tnfa_il1b.xlsx"
+FRACTIONS_PATH  <- "..\data\external\excel_inputs\IL1 and CD36 fractions repository.xlsx"
 ```
 
 ### Data Ingestion & Parsing Workflow

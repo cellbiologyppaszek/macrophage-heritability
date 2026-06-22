@@ -29,7 +29,7 @@ SANN_MAX_ITER    <- 100   # Optimization iterations (Increase for final converge
 LAMBDA_WEIGHT    <- 1.0   # Scale factor balancing Mean vs. CV residuals
 
 # Data Pipeline Configuration
-DATA_PATH  <- "C:/Users/apurv/OneDrive/Desktop/Data Analysis/rate switch/IL! and CD36 fractions.xlsx"
+DATA_PATH  <- "..\data\external\excel_inputs\IL1 and CD36 fractions repository.xlsx"
 DATA_SHEET <- "Cd36 fractions"
 EPSILON    <- 1e-4
 

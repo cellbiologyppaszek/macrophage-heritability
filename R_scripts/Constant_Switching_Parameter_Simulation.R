@@ -28,7 +28,7 @@ NUM_COLONIES <- 10000
 T_END_SIM    <- 144   
 
 # File Paths & Settings
-DATA_PATH  <- "C:/Users/apurv/OneDrive/Desktop/Data Analysis/rate switch/IL! and CD36 fractions.xlsx"
+DATA_PATH  <- "..\data\external\excel_inputs\IL1 and CD36 fractions repository.xlsx"
 DATA_SHEET <- "Cd36 fractions" # Change to "IL1B fraction" as needed
 EPSILON    <- 1e-4
 

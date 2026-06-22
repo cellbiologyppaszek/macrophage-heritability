@@ -35,7 +35,7 @@ KMAX_SCALE    <- 0.151922586
 KOFF_CONSTANT <- 0.028
 
 # Input/Output Configurations
-DATA_PATH     <- "C:/Users/apurv/OneDrive/Desktop/Data Analysis/rate switch/IL! and CD36 fractions.xlsx"
+DATA_PATH     <- "..\data\external\excel_inputs\IL1 and CD36 fractions repository.xlsx"
 DATA_SHEET    <- "Cd36 fractions"
 EPSILON       <- 1e-4
 X_GRID        <- seq(2, 10.5, length.out = 100)
