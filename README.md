@@ -1,353 +1,521 @@
-# Heritable single-cell gene expression analysis
+# Publication code and processed data
 
-This repository contains code and processed data used for the analysis of heritable single-cell gene expression programs in macrophage populations.
-
-The repository is intended to help readers understand, inspect, and reproduce the computational analysis associated with the publication.
-
-Large raw image files, large intermediate `.pkl` / `.pkl.gz` files, and sequencing input files are not stored in this GitHub repository. These files should be downloaded separately from the BioImage Archive and placed locally in `data/external/`.
-
-BioImage Archive accession: `TO_BE_ADDED`
-
-## Repository structure
+This repository contains the analysis code and small processed data tables used for the publication.  
+Large raw microscopy images, large intermediate image-analysis objects, and raw sequencing input files should **not** be stored in GitHub. They should be deposited in the BioImage Archive and downloaded by readers when they want to rerun the full analysis.
 
 ```text
-official_code/
-|
-|-- README.md
-|-- .gitignore
-|-- .gitattributes
-|
-|-- data/
-|   |
-|   |-- processed/
-|   |   |-- Cv_7_signals_FCV.csv
-|   |   |-- cv_experiment_vs_theory_p65_relb_cd36.csv
-|   |   |-- cv_experiment_vs_theory_tnfa_il1b_combine.csv
-|   |   |-- cv_experiment_vs_theory_tnfr2_f480.csv
-|   |
-|   |-- external/
-|       |-- README_external_data.md
-|       |
-|       | Large raw or intermediate input files downloaded from the
-|       | BioImage Archive should be placed here locally.
-|       | This folder should not be committed to GitHub.
-|
-|-- notebooks/
-|   |-- 7gens_plot.ipynb
-|   |-- cd36_listeria.ipynb
-|   |-- Density-CD36 IL1-programmes.ipynb
-|   |-- NMF_CD36_IL1.ipynb
-|   |-- p65_relb_cd36_costainning.ipynb
-|   |-- tnfa_il1b_costainning.ipynb
-|   |-- tnfr2_f480_costainning.ipynb
-|
-|-- R_scripts/
-|   |-- Constant_Switching_Parameter_Simulation.R
-|   |-- Constant_Switching_Rates_Calculation.Rmd
-|   |-- Density_Dependent_Parameter_Simulation.R
-|   |-- Density_Dependent_Parameter_Simulation_kmax_beta.R
-|   |-- Optimized_Parameter_Estimation.R
-|   |-- cv_fold_change_MemorySeq.R
-|   |-- cv_fold_change_scRNAseq.R
+BioImage Archive accession: S-BIAD2517
+BioImage Archive download link: https://www.ebi.ac.uk/biostudies/bioimages/studies/S-BIAD2517
+
+Raw microscopy and large analysis files are available from the BioImage Archive:
+https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/517/S-BIAD2517/Files/external\_data.zip
+
+\---
+
+## 1\. Recommended GitHub structure
+
+Organize the repository like this:
+
+```text
+official\_code/
+├── README.md
+├── .gitignore
+│
+├── data/
+│   ├── processed/
+│   │   ├── Cv\_7\_signals\_FCV.csv
+│   │   ├── cv\_experiment\_vs\_theory\_p65\_relb\_cd36.csv
+│   │   ├── cv\_experiment\_vs\_theory\_tnfa\_il1b\_combine.csv
+│   │   └── cv\_experiment\_vs\_theory\_tnfr2\_f480.csv
+│   │
+│   └── external/
+│       └── README\_external\_data.md
+│       # Raw or large input files downloaded from BioImage Archive go here.
+│       # This folder should not be committed to GitHub.
+│
+├── notebooks/
+│   ├── 7gens\_plot.ipynb
+│   ├── cd36\_listeria.ipynb
+│   ├── Density-CD36 IL1-programmes.ipynb
+│   ├── NMF\_CD36\_IL1.ipynb
+│   ├── p65\_relb\_cd36\_costainning.ipynb
+│   ├── tnfa\_il1b\_costainning.ipynb
+│   └── tnfr2\_f480\_costainning.ipynb
+│
+├── R\_scripts/
+│   ├── Constant\_Switching\_colony\_tracking\_Simulation\_kmax\_beta.R
+│   ├── Constant\_Switching\_Parameter\_Simulation.R
+│   ├── Constant\_Switching\_Rates\_Calculation.Rmd
+│   ├── Density\_Dependent\_colony\_tracking\_Simulation\_kmax\_beta.R
+│   ├── Density\_Dependent\_Parameter\_Simulation.R
+│   ├── Density\_Dependent\_Parameter\_Simulation\_kmax\_beta.R
+│   ├── Optimized\_Parameter\_Estimation.R
+│   ├── cv\_fold\_change\_MemorySeq.R
+│   └── cv\_fold\_change\_scRNAseq.R
+│
+├── results/
+│   # Generated tables, pickles, and intermediate output files.
+│
+└── figures/
+    # Generated SVG, PNG, or PDF figures.
 ```
 
-## What is included in GitHub
+### What belongs in GitHub?
 
-This GitHub repository includes:
+|File type|Store in GitHub?|Reason|
+|-|-:|-|
+|`README.md`|Yes|Explains how to use the repository.|
+|Jupyter notebooks, `.ipynb`|Yes|Main Python analysis workflows.|
+|R scripts, `.R` / `.Rmd`|Yes|Simulation, parameter estimation, and sequencing CV analyses.|
+|Small processed CSV tables|Yes|Allow readers to reproduce summary plots quickly.|
+|Raw microscopy images|No|Too large for GitHub; deposit in BioImage Archive.|
+|Large `.pkl`, `.pkl.gz`, `.h5`, `.tif`, `.czi`, `.nd2` files|No|Deposit in BioImage Archive or another data archive.|
+|Temporary files, checkpoints, logs|No|Not needed for reproducibility.|
 
-| Folder | Content | Purpose |
-|---|---|---|
-| `data/processed/` | Small processed CSV files | Processed summary data used for plotting and comparison |
-| `notebooks/` | Jupyter notebooks | Python analysis and figure-generation workflows |
-| `R_scripts/` | R and R Markdown scripts | Simulation, parameter estimation, and CV fold-change analysis |
-| `README.md` | Main documentation | Instructions for readers |
-| `.gitignore` | Git exclusion rules | Prevents raw and large files from being uploaded |
-| `.gitattributes` | Line-ending rules | Keeps text files consistent across operating systems |
+\---
 
-## What is not included in GitHub
+## 2\. Quick start for readers
 
-The following files should not be committed to GitHub:
+### 2.1 Clone the GitHub repository
 
-| File type | Example | Where to store |
-|---|---|---|
-| Raw microscopy images | `.tif`, `.tiff`, `.czi`, `.nd2`, `.lif` | BioImage Archive |
-| Large intermediate image-analysis files | `.pkl`, `.pkl.gz` | BioImage Archive |
-| Large sequencing input files | `*_quant.sf`, large `.xlsx`, large `.pkl` | BioImage Archive |
-| Temporary files | `.ipynb_checkpoints/`, `.Rhistory`, `__pycache__/` | Do not archive |
-| Generated local output | `results/`, `figures/` | Regenerate locally |
+```bash
+git clone https://github.com/\[USER]/\[REPOSITORY].git
+cd \[REPOSITORY]
+```
 
-Locally, these external files should be placed under:
+### 2.2 Download external data from BioImage Archive
+
+After the BioImage Archive accession is available, download the raw and large processed input files and place them in:
 
 ```text
 data/external/
 ```
 
-## Processed data files included in GitHub
-
-The following processed CSV files are included in `data/processed/`.
-
-| File | Role |
-|---|---|
-| `Cv_7_signals_FCV.csv` | Processed coefficient-of-variation and fold-change data for multiple measured signals |
-| `cv_experiment_vs_theory_p65_relb_cd36.csv` | Processed comparison between experimental and theoretical CV values for p65, RelB, and CD36 |
-| `cv_experiment_vs_theory_tnfa_il1b_combine.csv` | Processed comparison between experimental and theoretical CV values for TNFA and IL1B |
-| `cv_experiment_vs_theory_tnfr2_f480.csv` | Processed comparison between experimental and theoretical CV values for TNFR2 and F4/80 |
-
-These files are small enough to be stored directly in GitHub and can be used by readers without downloading the full raw BioImage Archive dataset.
-
-## External data expected from BioImage Archive
-
-To rerun the complete analysis from large raw or intermediate files, download the required files from the BioImage Archive and place them under `data/external/`.
-
-Recommended local structure:
+The small processed CSV files are already included in:
 
 ```text
+data/processed/
+```
+
+### 2.3 Install Python packages
+
+A standard Python environment with Jupyter is sufficient for most notebooks.
+
+```bash
+python -m venv .venv
+# Windows PowerShell:
+.\\.venv\\Scripts\\Activate.ps1
+
+# macOS/Linux:
+# source .venv/bin/activate
+
+pip install pandas numpy matplotlib seaborn scipy scikit-learn statsmodels jupyter
+pip install mygene statannotations libpysal esda splot
+```
+
+The spatial-analysis packages `libpysal`, `esda`, and `splot` are mainly needed for the `cd36\_listeria.ipynb` notebook.
+
+### 2.4 Install R packages
+
+Use R version 4.0 or newer.
+
+```r
+install.packages(c(
+  "readxl",
+  "ggplot2",
+  "dplyr",
+  "purrr",
+  "tidyr",
+  "patchwork",
+  "rmarkdown",
+  "knitr",
+  "BB",
+  "readr",
+  "stringr",
+  "tibble",
+  "writexl"
+))
+```
+
+\---
+
+## 3\. Important path note
+
+The notebooks were originally written as interactive analysis notebooks. Several notebooks read files using simple relative filenames such as:
+
+```python
+pd.read\_pickle("p65\_relb\_cd36.pkl.gz", compression="gzip")
+pd.read\_csv("cv\_experiment\_vs\_theory\_p65\_relb\_cd36.csv")
+```
+
+If you use the recommended GitHub structure, update the first data-loading cells so that files are read from `data/processed/` or `data/external/`.
+
+For example, if the notebook is inside the `notebooks/` folder:
+
+```python
+from pathlib import Path
+
+PROCESSED\_DIR = Path("../data/processed")
+EXTERNAL\_DIR = Path("../data/external")
+RESULTS\_DIR = Path("../results")
+FIGURES\_DIR = Path("../figures")
+
+CSV\_P65\_RELB\_CD36 = PROCESSED\_DIR / "cv\_experiment\_vs\_theory\_p65\_relb\_cd36.csv"
+CSV\_TNFR2\_F480 = PROCESSED\_DIR / "cv\_experiment\_vs\_theory\_tnfr2\_f480.csv"
+CSV\_TNFA\_IL1B = PROCESSED\_DIR / "cv\_experiment\_vs\_theory\_tnfa\_il1b\_combine.csv"
+```
+
+For raw image-analysis notebooks, update pickle paths similarly:
+
+```python
+file\_path = EXTERNAL\_DIR / "p65\_relb\_cd36.pkl.gz"
+quant\_df = pd.read\_pickle(file\_path, compression="gzip")
+```
+
+\---
+
+## 4\. Included processed CSV data
+
+These files are small processed summary tables. They are suitable for GitHub and allow readers to reproduce the final coefficient-of-variation comparison plots without downloading the full raw microscopy dataset.
+
+|File|Rows × columns|Role|Main columns|Used by|
+|-|-:|-|-|-|
+|`data/processed/Cv\_7\_signals\_FCV.csv`|112 × 11|Combined seven-signal summary table containing experiment/theory CV summaries and fold-change CV values from MemorySeq and scRNA-seq.|`Cell\_Bin`, `Lipid A`, `Mean`, `SD`, `Source`, `Signal`, `Sampling`, `gene\_name`, `FCV MemSeq`, `FCV scRNA-sq`|Final summary/reporting table|
+|`data/processed/cv\_experiment\_vs\_theory\_p65\_relb\_cd36.csv`|48 × 6|Experiment-versus-theory CV summary for p65, RelB, and CD36.|`Cell\_Bin`, `Lipid A`, `Mean`, `SD`, `Source`, `Signal`|`notebooks/7gens\_plot.ipynb`|
+|`data/processed/cv\_experiment\_vs\_theory\_tnfa\_il1b\_combine.csv`|32 × 6|Experiment-versus-theory CV summary for TNFα and IL-1β.|`Cell\_Bin`, `Lipid A`, `Mean`, `SD`, `Source`, `Signal`|`notebooks/7gens\_plot.ipynb`|
+|`data/processed/cv\_experiment\_vs\_theory\_tnfr2\_f480.csv`|32 × 6|Experiment-versus-theory CV summary for TNFR2 and F4/80.|`Cell\_Bin`, `Lipid A`, `Mean`, `SD`, `Source`, `Signal`|`notebooks/7gens\_plot.ipynb`|
+
+### Column definitions
+
+|Column|Meaning|
+|-|-|
+|`Cell\_Bin`|Colony/cell-number bin. Values include `<4`, `4-6`, `6-8`, and `>8`.|
+|`Lipid A`|Stimulation condition. Values include `Mock` and `500 ng/mL`.|
+|`Mean`|Mean coefficient-of-variation summary value for the group.|
+|`SD`|Standard deviation of the coefficient-of-variation summary value for the group.|
+|`Source`|Indicates whether the value comes from `Experiment` or `Theory`.|
+|`Signal`|Measured marker/signal, for example `per\_cd36\_mean`, `per\_p65\_mean`, `per\_relb\_mean`, `per\_il1b\_mean`, `per\_tnfa\_mean`, `per\_tnfr2\_mean`, or `per\_f480\_mean`.|
+|`Sampling`|Sampling scheme used in the combined seven-signal FCV table.|
+|`gene\_name`|Gene name corresponding to the signal.|
+|`FCV MemSeq`|Fold-change CV value calculated from MemorySeq data.|
+|`FCV scRNA-sq`|Fold-change CV value calculated from scRNA-seq data.|
+
+\---
+
+## 5\. External data expected from BioImage Archive
+
+The following files are required only if readers want to rerun the full raw-data analysis. These files should be deposited in the BioImage Archive and placed locally in `data/external/` after download.
+
+|Expected file or file pattern|Used by|Purpose|
+|-|-|-|
+|`p65\_relb\_cd36.pkl.gz`|`notebooks/p65\_relb\_cd36\_costainning.ipynb`|Raw or intermediate single-cell image-analysis table for p65, RelB, and CD36 co-staining.|
+|`WellsInfo1.pkl`|`notebooks/p65\_relb\_cd36\_costainning.ipynb`|Plate/well layout metadata for the p65/RelB/CD36 analysis.|
+|`p65\_relb\_cd36\_clone\_threshold.csv`|`notebooks/p65\_relb\_cd36\_costainning.ipynb`|Clone threshold table used to classify or filter p65/RelB/CD36 clone populations.|
+|`tnfr2\_f480.pkl.gz`|`notebooks/tnfr2\_f480\_costainning.ipynb`|Raw or intermediate single-cell image-analysis table for TNFR2 and F4/80 co-staining.|
+|`WellsInfo2.pkl`|`notebooks/tnfr2\_f480\_costainning.ipynb`|Plate/well layout metadata for the TNFR2/F4/80 analysis.|
+|`IF22\_co.pkl.gz`|`notebooks/tnfa\_il1b\_costainning.ipynb`|Raw or intermediate single-cell image-analysis table for one TNFα/IL-1β experiment.|
+|`IF24\_co.pkl.gz`|`notebooks/tnfa\_il1b\_costainning.ipynb`|Raw or intermediate single-cell image-analysis table for one TNFα/IL-1β experiment.|
+|`IF48\_listeria.pkl.gz`|`notebooks/cd36\_listeria.ipynb`|Raw or intermediate single-cell image-analysis table for one CD36/Listeria experiment.|
+|`IF50\_listeria.pkl.gz`|`notebooks/cd36\_listeria.ipynb`|Raw or intermediate single-cell image-analysis table for one CD36/Listeria experiment.|
+|`IF54\_listeria.pkl.gz`|`notebooks/cd36\_listeria.ipynb`|Raw or intermediate single-cell image-analysis table for one CD36/Listeria experiment.|
+|`\*\_quant.sf`|`notebooks/Density-CD36 IL1-programmes.ipynb`|Transcript-level quantification files used to build gene-level expression summaries.|
+|`scRNA\_filtered\_genes.pkl`|`notebooks/NMF\_CD36\_IL1.ipynb`|Filtered scRNA-seq gene-expression matrix used for NMF/program analysis.|
+|`MemorySeq data.xlsx`|`R\_scripts/cv\_fold\_change\_MemorySeq.R`|MemorySeq expression workbook and gene-list workbook sheets.|
+|`combined\_logcounts\_JM01.xlsx` to `combined\_logcounts\_JM12.xlsx`|`R\_scripts/cv\_fold\_change\_scRNAseq.R`|scRNA-seq logcount matrices for clonal and mixed samples.|
+|`IL! and CD36 fractions.xlsx`|`R\_scripts/Constant\_Switching\_Parameter\_Simulation.R`, `R\_scripts/Density\_Dependent\_Parameter\_Simulation.R`, `R\_scripts/Density\_Dependent\_Parameter\_Simulation\_kmax\_beta.R`, `R\_scripts/Optimized\_Parameter\_Estimation.R`, `R\_scripts/Constant\_Switching\_Rates\_Calculation.Rmd`|Experimental fraction data used for parameter estimation and simulation benchmarking.|
+|`Corrected\_odds\_ratio\_CD36\_tnfa\_il1b.xlsx`|`R\_scripts/Constant\_Switching\_Rates\_Calculation.Rmd`|Odds-ratio workbook used to estimate switching rates.|
+
+If filenames are changed during BioImage Archive upload or download, update the corresponding path variables in the notebook or R script.
+
+\---
+
+## 6\. How to reproduce the final seven-signal CV comparison figure
+
+This is the simplest analysis to rerun because it uses only the processed CSV files included in GitHub.
+
+1. Make sure the processed CSV files are in:
+
+```text
+   data/processed/
+   ```
+
+2. Start Jupyter:
+
+```bash
+   jupyter lab
+   ```
+
+3. Open:
+
+```text
+   notebooks/7gens\_plot.ipynb
+   ```
+
+4. Update the CSV path variables if needed:
+
+```python
+   from pathlib import Path
+
+   PROCESSED\_DIR = Path("../data/processed")
+
+   CSV\_P65\_RELB\_CD36 = PROCESSED\_DIR / "cv\_experiment\_vs\_theory\_p65\_relb\_cd36.csv"
+   CSV\_TNFR2\_F480 = PROCESSED\_DIR / "cv\_experiment\_vs\_theory\_tnfr2\_f480.csv"
+   CSV\_TNFA\_IL1B = PROCESSED\_DIR / "cv\_experiment\_vs\_theory\_tnfa\_il1b\_combine.csv"
+
+   SVG\_PATH\_GRID = "../figures/cv\_grid.svg"
+   SVG\_PATH\_SINGLE = "../figures/cv\_single.svg"
+   ```
+
+5. Run all cells.
+
+Expected output:
+
+```text
+figures/cv\_grid.svg
+```
+
+This figure compares experimental and theoretical CV summaries across the seven measured signals.
+
+\---
+
+## 7\. Notebook guide
+
+|Notebook|Main role|Main input data|Main outputs|
+|-|-|-|-|
+|`notebooks/7gens\_plot.ipynb`|Generates the final seven-signal experiment-versus-theory CV plot.|Processed CSV files in `data/processed/`.|`cv\_grid.svg`, optional single-signal SVG plots.|
+|`notebooks/p65\_relb\_cd36\_costainning.ipynb`|Processes p65, RelB, and CD36 co-staining image-analysis data; performs colony/clone summaries and CV comparison.|`p65\_relb\_cd36.pkl.gz`, `WellsInfo1.pkl`, `p65\_relb\_cd36\_clone\_threshold.csv`.|Cleaned pickle files, clone morphology tables, average signal tables, `cv\_experiment\_vs\_theory\_p65\_relb\_cd36.csv`, and SVG figures.|
+|`notebooks/tnfa\_il1b\_costainning.ipynb`|Processes TNFα and IL-1β co-staining image-analysis data.|`IF22\_co.pkl.gz`, `IF24\_co.pkl.gz`.|Cleaned/intermediate pickle files for TNFα/IL-1β analysis.|
+|`notebooks/tnfr2\_f480\_costainning.ipynb`|Processes TNFR2 and F4/80 co-staining image-analysis data.|`tnfr2\_f480.pkl.gz`, `WellsInfo2.pkl`.|Cleaned/intermediate pickle files and plate overview figures.|
+|`notebooks/cd36\_listeria.ipynb`|Processes CD36/Listeria perinuclear signal data and spatial statistics.|`IF48\_listeria.pkl.gz`, `IF50\_listeria.pkl.gz`, `IF54\_listeria.pkl.gz`.|`cd36\_Listeria\_clean.pkl` and spatial/statistical plots.|
+|`notebooks/Density-CD36 IL1-programmes.ipynb`|Builds gene-level expression tables from transcript quantification files.|Files matching `\*\_quant.sf`.|`df\_gene.pkl`, `df\_gene.csv`.|
+|`notebooks/NMF\_CD36\_IL1.ipynb`|Performs latent program/NMF analysis for CD36 and IL1B-related gene programs.|`scRNA\_filtered\_genes.pkl`.|NMF/program annotation figures including SVG, PNG, and PDF outputs.|
+
+\---
+
+## 8\. R script guide
+
+|Script|Main role|Main input data|Main outputs|
+|-|-|-|-|
+|`R\_scripts/Constant\_Switching\_Rates\_Calculation.Rmd`|Estimates constant switching rates from odds-ratio and fraction workbooks.|`Corrected\_odds\_ratio\_CD36\_tnfa\_il1b.xlsx`, `IL! and CD36 fractions.xlsx`.|Rendered HTML report and estimated rate summaries printed in the report.|
+|`R\_scripts/Optimized\_Parameter\_Estimation.R`|Optimizes density-dependent switching parameters by matching simulated and experimental mean/CV profiles.|`IL! and CD36 fractions.xlsx`.|Optimized parameter values printed to the console.|
+|`R\_scripts/Constant\_Switching\_Parameter\_Simulation.R`|Runs Gillespie simulations with constant ON/OFF switching rates and compares with experimental fraction data.|`IL! and CD36 fractions.xlsx`.|Simulation plots; optional CSV export if the commented `write.csv()` line is enabled.|
+|`R\_scripts/Density\_Dependent\_Parameter\_Simulation.R`|Runs density-dependent switching simulations with a Hill-type activation function.|`IL! and CD36 fractions.xlsx`.|`CD36\_simulated\_density\_constant\_rates.csv`, `simulated\_loess\_trend\_data\_kON\_constant\_wCI.csv`.|
+|`R\_scripts/Density\_Dependent\_Parameter\_Simulation\_kmax\_beta.R`|Runs density-dependent simulations with Beta-distributed maximum activation rates.|`IL! and CD36 fractions.xlsx`.|`CD36\_simulated\_density\_beta\_rates\_doublerate14\_4.csv`, `simulated\_loess\_trend\_data\_kON\_constant\_wCI.csv`, `experimental\_loess\_trend\_data\_kON\_constant\_wCI.csv`.|
+|`R\_scripts/Constant\_Switching\_colony\_tracking\_Simulation\_kmax\_beta.R`|Simulates lineage-resolved colony growth with constant phenotypic switching rates.|No external file required; parameters are defined inside the script.|Lineage tracking table in memory and plots printed to the R graphics device.|
+|`R\_scripts/Density\_Dependent\_colony\_tracking\_Simulation\_kmax\_beta.R`|Simulates lineage-resolved colony growth with density-dependent switching rates.|No external file required; parameters are defined inside the script.|Lineage tracking table in memory and plots printed to the R graphics device; optional CSV export if the commented `write.csv()` line is enabled.|
+|`R\_scripts/cv\_fold\_change\_MemorySeq.R`|Calculates MemorySeq CV fold-change and heritability classification for gene sets.|`data/MemorySeq data.xlsx` or `data/external/MemorySeq data.xlsx`, depending on the chosen path convention.|`results/CV\_fold\_change\_heritability\_MemorySeq.xlsx`, missing-gene text files, and `sessionInfo.txt`.|
+|`R\_scripts/cv\_fold\_change\_scRNAseq.R`|Calculates scRNA-seq CV fold-change between clonal and mixed populations.|`combined\_logcounts\_JM01.xlsx` to `combined\_logcounts\_JM12.xlsx`.|`results/scRNAseq\_CV\_fold\_change\_clonal\_vs\_mixed.xlsx`.|
+
+\---
+
+## 9\. Running the R scripts
+
+Run R scripts from the repository root unless otherwise noted.
+
+### Example: MemorySeq CV fold-change analysis
+
+Expected input:
+
+```text
+data/MemorySeq data.xlsx
+```
+
+Run:
+
+```bash
+Rscript R\_scripts/cv\_fold\_change\_MemorySeq.R
+```
+
+Expected output:
+
+```text
+results/CV\_fold\_change\_heritability\_MemorySeq.xlsx
+results/sessionInfo.txt
+```
+
+### Example: scRNA-seq CV fold-change analysis
+
+Expected inputs:
+
+```text
+data/combined\_logcounts\_JM01.xlsx
+data/combined\_logcounts\_JM02.xlsx
+...
+data/combined\_logcounts\_JM12.xlsx
+```
+
+Run:
+
+```bash
+Rscript R\_scripts/cv\_fold\_change\_scRNAseq.R
+```
+
+Expected output:
+
+```text
+results/scRNAseq\_CV\_fold\_change\_clonal\_vs\_mixed.xlsx
+```
+
+### Example: render the rate-calculation R Markdown file
+
+```bash
+Rscript -e "rmarkdown::render('R\_scripts/Constant\_Switching\_Rates\_Calculation.Rmd')"
+```
+
+### Important R path note
+
+Some R scripts currently contain local Windows paths, for example:
+
+```r
+DATA\_PATH <- "C:/Users/apurv/OneDrive/Desktop/Data Analysis/rate switch/IL! and CD36 fractions.xlsx"
+```
+
+For publication, replace these with relative paths, for example:
+
+```r
+DATA\_PATH <- file.path("data", "external", "IL! and CD36 fractions.xlsx")
+```
+
+or, if you decide to keep Excel inputs directly in `data/`:
+
+```r
+DATA\_PATH <- file.path("data", "IL! and CD36 fractions.xlsx")
+```
+
+\---
+
+## 10\. Suggested order for full reproducibility
+
+The exact order depends on which part of the paper the reader wants to reproduce.
+
+### A. Reproduce final summary plots only
+
+Use this route if the reader only wants to recreate the final seven-signal CV plot.
+
+```text
+data/processed/\*.csv
+        ↓
+notebooks/7gens\_plot.ipynb
+        ↓
+figures/cv\_grid.svg
+```
+
+### B. Rerun image-analysis notebooks from large BioImage Archive files
+
+Use this route if the reader wants to regenerate cleaned single-cell/clone tables from image-analysis outputs.
+
+```text
+data/external/\*.pkl.gz and WellsInfo\*.pkl
+        ↓
+notebooks/\*costainning.ipynb and notebooks/cd36\_listeria.ipynb
+        ↓
+results/\*.pkl, results/\*.csv, figures/\*.svg
+```
+
+### C. Rerun stochastic switching simulations
+
+Use this route if the reader wants to reproduce model simulations and parameter-estimation workflows.
+
+```text
+data/external/IL! and CD36 fractions.xlsx
+data/external/Corrected\_odds\_ratio\_CD36\_tnfa\_il1b.xlsx
+        ↓
+R\_scripts/Constant\_Switching\_Rates\_Calculation.Rmd
+R\_scripts/Optimized\_Parameter\_Estimation.R
+R\_scripts/\*Simulation\*.R
+        ↓
+simulation summary CSVs and model-comparison figures
+```
+
+### D. Rerun MemorySeq/scRNA-seq CV fold-change analyses
+
+Use this route if the reader wants to reproduce the FCV values reported in the combined seven-signal table.
+
+```text
+data/external/MemorySeq data.xlsx
+data/external/combined\_logcounts\_JM\*.xlsx
+        ↓
+R\_scripts/cv\_fold\_change\_MemorySeq.R
+R\_scripts/cv\_fold\_change\_scRNAseq.R
+        ↓
+results/\*.xlsx
+```
+
+\---
+
+## 11\. Suggested `.gitignore`
+
+Use a `.gitignore` file to prevent raw or temporary files from being committed accidentally:
+
+```text
+# External large files downloaded from BioImage Archive
 data/external/
-|
-|-- raw_image_files/
-|   | Raw microscopy image files
-|
-|-- pkl_intermediate_files/
-|   | Image-analysis intermediate tables
-|
-|-- sequencing_inputs/
-|   | Sequencing or transcriptomic input files
-|
-|-- excel_inputs/
-    | Excel files used by R scripts
+
+# Generated outputs
+results/
+figures/
+
+# Jupyter temporary files
+.ipynb\_checkpoints/
+
+# Python temporary files
+\_\_pycache\_\_/
+\*.pyc
+
+# R temporary files
+.Rhistory
+.RData
+.Rproj.user/
+
+# System files
+.DS\_Store
+Thumbs.db
+
+# Logs
+\*.log
+
+# Large raw or intermediate data
+\*.pkl
+\*.pkl.gz
+\*.h5
+\*.hdf5
+\*.tif
+\*.tiff
+\*.czi
+\*.nd2
+\*.lif
+\*.zip
+\*.tar.gz
 ```
 
-### Image-analysis intermediate files
+The four processed CSV files in `data/processed/` should remain tracked by Git.
 
-Place these files in:
+\---
+
+## 12\. Notes for users
+
+1. The processed CSV files in `data/processed/` are sufficient to reproduce the final CV comparison plot.
+2. The full raw-data workflow requires external files from BioImage Archive.
+3. Some notebooks and R scripts may require minor path edits because they were originally developed interactively.
+4. For exact reproducibility, keep the downloaded BioImage Archive filenames unchanged, or update the path variables consistently.
+5. Generated output files should be written to `results/` or `figures/`, not mixed with source code.
+
+\---
+
+## 13\. Citation
+
+If you use this code, processed data, or the associated external data, please cite the associated publication:
 
 ```text
-data/external/pkl_intermediate_files/
+DOI: 10.64898/2026.06.17.732820
 ```
 
-| File | Used by |
-|---|---|
-| `p65_relb_cd36.pkl.gz` | `notebooks/p65_relb_cd36_costainning.ipynb` |
-| `WellsInfo1.pkl` | `notebooks/p65_relb_cd36_costainning.ipynb` |
-| `tnfr2_f480.pkl.gz` | `notebooks/tnfr2_f480_costainning.ipynb` |
-| `WellsInfo2.pkl` | `notebooks/tnfr2_f480_costainning.ipynb` |
-| `IF22_co.pkl.gz` | `notebooks/tnfa_il1b_costainning.ipynb` |
-| `IF24_co.pkl.gz` | `notebooks/tnfa_il1b_costainning.ipynb` |
-| `IF48_listeria.pkl.gz` | `notebooks/cd36_listeria.ipynb` |
-| `IF50_listeria.pkl.gz` | `notebooks/cd36_listeria.ipynb` |
-| `IF54_listeria.pkl.gz` | `notebooks/cd36_listeria.ipynb` |
+Publication DOI: [https://doi.org/10.64898/2026.06.17.732820](https://doi.org/10.64898/2026.06.17.732820)
 
-### Sequencing input files
-
-Place these files in:
+Data availability:
 
 ```text
-data/external/sequencing_inputs/
+Raw microscopy and large analysis files are available from the BioImage Archive:
+https://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/517/S-BIAD2517/Files/external\_data.zip
 ```
 
-| File or file pattern | Used by |
-|---|---|
-| `*_quant.sf` | `notebooks/Density-CD36 IL1-programmes.ipynb` |
-| `scRNA_filtered_genes.pkl` | `notebooks/NMF_CD36_IL1.ipynb` |
-| `MemorySeq data.xlsx` | `R_scripts/cv_fold_change_MemorySeq.R` |
-| `combined_logcounts_JM01.xlsx` to `combined_logcounts_JM12.xlsx` | `R_scripts/cv_fold_change_scRNAseq.R` |
-
-### Excel input files for model fitting and simulation
-
-Place these files in:
-
-```text
-data/external/excel_inputs/
-```
-
-| File | Used by |
-|---|---|
-| `IL1 and CD36 fractions.xlsx` | `R_scripts/Constant_Switching_Parameter_Simulation.R`, `R_scripts/Density_Dependent_Parameter_Simulation.R`, `R_scripts/Density_Dependent_Parameter_Simulation_kmax_beta.R`, `R_scripts/Optimized_Parameter_Estimation.R`, `R_scripts/Constant_Switching_Rates_Calculation.Rmd` |
-| `odds_ratio_CD36_tnfa_il1b.xlsx` | `R_scripts/Constant_Switching_Rates_Calculation.Rmd` |
-
-Note: Please check whether the filename `IL1 and CD36 fractions.xlsx` is intentional. If the intended name is `IL1 and CD36 fractions.xlsx` or `IL-1 and CD36 fractions.xlsx`, update the filename and the scripts consistently.
-
-## Software requirements
-
-### Python
-
-Recommended Python version:
-
-```text
-Python 3.9 or newer
-```
-
-Common Python packages used by the notebooks include:
-
-```text
-numpy
-pandas
-matplotlib
-seaborn
-scipy
-scikit-learn
-jupyter
-openpyxl
-```
-
-Install them using:
-
-```bash
-pip install numpy pandas matplotlib seaborn scipy scikit-learn jupyter openpyxl
-```
-
-Or, using conda:
-
-```bash
-conda create -n macrophage_expression python=3.10
-conda activate macrophage_expression
-conda install numpy pandas matplotlib seaborn scipy scikit-learn jupyter openpyxl
-```
-
-### R
-
-Recommended R version:
-
-```text
-R 4.0 or newer
-```
-
-Common R packages used by the scripts include:
-
-```text
-readxl
-dplyr
-ggplot2
-tidyr
-data.table
-```
-
-Install them in R using:
-
-```r
-install.packages(c("readxl", "dplyr", "ggplot2", "tidyr", "data.table"))
-```
-
-## How to run the analysis
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/cellbiologyppaszek/macrophage-heritability.git
-cd macrophage-heritability
-```
-
-### 2. Download external files
-
-Download the external raw and intermediate files from the BioImage Archive.
-
-Place them locally under:
-
-```text
-data/external/
-```
-
-For example:
-
-```text
-data/external/pkl_intermediate_files/
-data/external/sequencing_inputs/
-data/external/excel_inputs/
-```
-
-### 3. Run the Jupyter notebooks
-
-Start Jupyter from the repository root:
-
-```bash
-jupyter notebook
-```
-
-Open notebooks from the `notebooks/` folder.
-
-Recommended order:
-
-| Step | Notebook | Purpose |
-|---|---|---|
-| 1 | `notebooks/7gens_plot.ipynb` | Plot and summarize processed CV and fold-change data |
-| 2 | `notebooks/p65_relb_cd36_costainning.ipynb` | Analyze p65, RelB, and CD36 co-staining data |
-| 3 | `notebooks/tnfa_il1b_costainning.ipynb` | Analyze TNFA and IL1B co-staining data |
-| 4 | `notebooks/tnfr2_f480_costainning.ipynb` | Analyze TNFR2 and F4/80 co-staining data |
-| 5 | `notebooks/cd36_listeria.ipynb` | Analyze CD36-related Listeria infection data |
-| 6 | `notebooks/Density-CD36 IL1-programmes.ipynb` | Analyze CD36 and IL1-related transcriptional programs |
-| 7 | `notebooks/NMF_CD36_IL1.ipynb` | Perform NMF analysis of CD36 and IL1-associated programs |
-
-Some notebooks may need path updates depending on where the BioImage Archive files are placed locally.
-
-For example, if a notebook currently reads:
-
-```python
-pd.read_pickle("p65_relb_cd36.pkl.gz")
-```
-
-change it to:
-
-```python
-pd.read_pickle("../data/external/pkl_intermediate_files/p65_relb_cd36.pkl.gz")
-```
-
-If a notebook reads a processed CSV file from the current folder, change it to:
-
-```python
-pd.read_csv("../data/processed/Cv_7_signals_FCV.csv")
-```
-
-when running from the `notebooks/` folder.
-
-### 4. Run the R scripts
-
-Run R scripts from the repository root, or update paths inside the scripts.
-
-Example from command line:
-
-```bash
-Rscript R_scripts/Constant_Switching_Parameter_Simulation.R
-Rscript R_scripts/Density_Dependent_Parameter_Simulation.R
-Rscript R_scripts/Optimized_Parameter_Estimation.R
-Rscript R_scripts/cv_fold_change_MemorySeq.R
-Rscript R_scripts/cv_fold_change_scRNAseq.R
-```
-
-For the R Markdown file:
-
-```bash
-Rscript -e "rmarkdown::render('R_scripts/Constant_Switching_Rates_Calculation.Rmd')"
-```
-
-Some R scripts may contain local absolute paths from the original analysis computer. Replace them with relative paths such as:
-
-```r
-data_path <- "data/external/excel_inputs/IL1 and CD36 fractions.xlsx"
-```
-
-or:
-
-```r
-data_path <- "data/processed/Cv_7_signals_FCV.csv"
-```
-
-
-## Reproducibility notes
-
-1. The processed CSV files in `data/processed/` are included so that readers can inspect key processed data without downloading the full raw dataset.
-2. Full rerunning of the image-analysis workflows requires external files from the BioImage Archive.
-3. Some notebooks and R scripts may require path adjustments after reorganizing the repository.
-4. Large raw data and large intermediate files should remain in BioImage Archive, not GitHub.
-5. GitHub should contain only code, documentation, and small processed data files.
-
-## Citation
-
-If you use this repository, please cite the associated publication:
-
-```text
-TO_BE_ADDED
-```
-
-## Contact
-
-For questions about the code or data organization, please contact the corresponding author of the associated publication.
