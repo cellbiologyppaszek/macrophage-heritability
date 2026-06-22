@@ -60,8 +60,8 @@ official\_code/
 |   |-- tnfr2\_f480\_costainning.ipynb
 |
 |-- R\_scripts/
-|   |-- Constant\_Switching\_Parameter\_Simulation.R
 |   |-- Constant\_Switching\_Rates\_Calculation.Rmd
+|   |-- Density\_Dependent\_Parameter\_Simulation.R
 |   |-- Density\_Dependent\_Parameter\_Simulation\_kmax\_beta.R
 |   |-- Optimized\_Parameter\_Estimation.R
 |   |-- cv\_fold\_change\_MemorySeq.R
@@ -267,7 +267,7 @@ data/external/excel\_inputs/
 
 |Expected file|Used by|Purpose|
 |-|-|-|
-|`I1B and CD36 fractions.xlsx`|`R\_scripts/Constant\_Switching\_Parameter\_Simulation.R`, `R\_scripts/Density\_Dependent\_Parameter\_Simulation.R`, `R\_scripts/Density\_Dependent\_Parameter\_Simulation\_kmax\_beta.R`, `R\_scripts/Optimized\_Parameter\_Estimation.R`, `R\_scripts/Constant\_Switching\_Rates\_Calculation.Rmd`|Experimental fraction data used for parameter estimation and simulation benchmarking.|
+|`IL1 and CD36 fractions.xlsx`|`R\_scripts/Constant\_Switching\_Parameter\_Simulation.R`, `R\_scripts/Density\_Dependent\_Parameter\_Simulation.R`, `R\_scripts/Density\_Dependent\_Parameter\_Simulation\_kmax\_beta.R`, `R\_scripts/Optimized\_Parameter\_Estimation.R`, `R\_scripts/Constant\_Switching\_Rates\_Calculation.Rmd`|Experimental fraction data used for parameter estimation and simulation benchmarking.|
 |`Corrected\_odds\_ratio\_CD36\_tnfa\_il1b.xlsx`|`R\_scripts/Constant\_Switching\_Rates\_Calculation.Rmd`|Odds-ratio workbook used to estimate switching rates.|
 
 If filenames are changed during BioImage Archive download or extraction, update the corresponding path variables in the notebook or R script.
@@ -335,7 +335,7 @@ This figure compares experimental and theoretical CV summaries across the seven 
 
 |Script|Main role|Main input data|Main outputs|
 |-|-|-|-|
-|`R\_scripts/Constant\_Switching\_Rates\_Calculation.Rmd`|Estimates constant switching rates from odds-ratio and fraction workbooks.|`Corrected\_odds\_ratio\_CD36\_tnfa\_il1b.xlsx`, `IL! and CD36 fractions.xlsx`.|Rendered HTML report and estimated rate summaries printed in the report.|
+|`R\_scripts/Constant\_Switching\_Rates\_Calculation.Rmd`|Estimates constant switching rates from odds-ratio and fraction workbooks.|`Corrected\_odds\_ratio\_CD36\_tnfa\_il1b.xlsx`, `IL1 and CD36 fractions.xlsx`.|Rendered HTML report and estimated rate summaries printed in the report.|
 |`R\_scripts/Optimized\_Parameter\_Estimation.R`|Optimizes density-dependent switching parameters by matching simulated and experimental mean/CV profiles.|`IL! and CD36 fractions.xlsx`.|Optimized parameter values printed to the console.|
 |`R\_scripts/Constant\_Switching\_Parameter\_Simulation.R`|Runs Gillespie simulations with constant ON/OFF switching rates and compares with experimental fraction data.|`IL! and CD36 fractions.xlsx`.|Simulation plots; optional CSV export if the commented `write.csv()` line is enabled.|
 |`R\_scripts/Density\_Dependent\_Parameter\_Simulation.R`|Runs density-dependent switching simulations with a Hill-type activation function.|`IL! and CD36 fractions.xlsx`.|`CD36\_simulated\_density\_constant\_rates.csv`, `simulated\_loess\_trend\_data\_kON\_constant\_wCI.csv`.|
@@ -402,13 +402,13 @@ Rscript -e "rmarkdown::render('R\_scripts/Constant\_Switching\_Rates\_Calculatio
 Some R scripts currently contain local Windows paths, for example:
 
 ```r
-DATA\_PATH <- "  "
+DATA\_PATH <- "   "
 ```
 
 For publication, replace these with relative paths, for example:
 
 ```r
-DATA\_PATH <- file.path("data", "external", "excel\_inputs", "IL1B and CD36 fractions.xlsx")
+DATA\_PATH <- file.path("data", "external", "excel\_inputs", "IL! and CD36 fractions.xlsx")
 ```
 
 ## 11\. Suggested order for full reproducibility
@@ -449,7 +449,7 @@ results/\*.pkl, results/\*.csv, figures/\*.svg
 Use this route if the reader wants to reproduce model simulations and parameter-estimation workflows.
 
 ```text
-data/external/excel\_inputs/IL! and CD36 fractions.xlsx
+data/external/excel\_inputs/IL1 and CD36 fractions.xlsx
 data/external/excel\_inputs/Corrected\_odds\_ratio\_CD36\_tnfa\_il1b.xlsx
         |
         v
@@ -530,6 +530,7 @@ The four processed CSV files in `data/processed/` should remain tracked by Git.
 2. The full raw-data workflow requires external files from BioImage Archive.
 3. Some notebooks and R scripts may require minor path edits because they were originally developed interactively.
 4. For exact reproducibility, keep the downloaded BioImage Archive filenames unchanged, or update the path variables consistently.
+5. Generated output files should be written to `results/` or `figures/`, not mixed with source code.
 
 ## 14\. Citation
 
