@@ -457,7 +457,7 @@ results/*.xlsx
 
 ## Citation
 
-If you use this code, processed data, or the associated external data, please cite the associated publication:
+If you use this code, processed data, or the associated external data, please cite the associated publication:
 
 ```text
 DOI: 10.64898/2026.06.17.732820
